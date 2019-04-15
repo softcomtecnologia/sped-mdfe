@@ -200,7 +200,7 @@ class Make extends BaseMake
     /**
      * @type array
      */
-    private $aSeg = ''; //array de DOMNode
+    protected $aSeg = ''; //array de DOMNode
 
     /**
      * @type array
