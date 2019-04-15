@@ -54,7 +54,7 @@ class Make extends BaseMake
     /**
      * @type string|\DOMNode
      */
-    private $infMDFe = '';
+    protected $infMDFe = '';
 
     /**
      * @type string|\DOMNode
