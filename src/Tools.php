@@ -57,6 +57,20 @@ class Tools extends BaseTools
      */
     private $aLastRetEvent = array();
     /**
+     * @var string
+     */
+    public $pathSchemes = "";
+    /**
+     * Tools constructor.
+     * @param string $configJson
+     */
+    public function __construct($configJson = '')
+    {
+        parent::__construct($configJson);
+
+        $this->pathSchemes = realpath(__DIR__ . "/../../mdfe-laravel/src/schemes") . "/";
+    }
+    /**
      * imprime
      * Imprime o documento eletrônico (MDFe, CCe, Inut.)
      *
@@ -960,12 +974,11 @@ class Tools extends BaseTools
             return true;
         }
         $xsdFile = $aResp['Id'].'_v'.$aResp['versao'].'.xsd';
-        $xsdPath = NFEPHP_ROOT.DIRECTORY_SEPARATOR .
-            'schemes' .
-            DIRECTORY_SEPARATOR .
+        $xsdPath = $this->pathSchemes .
             $this->aConfig['schemesMDFe'] .
             DIRECTORY_SEPARATOR .
             $xsdFile;
+
         if (! is_file($xsdPath)) {
             $this->errors[] = "O arquivo XSD $xsdFile não foi localizado.";
             return false;
