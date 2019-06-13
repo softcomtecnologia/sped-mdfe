@@ -307,6 +307,7 @@ class Make extends BaseMake
         $cUF = '',
         $tpAmb = '',
         $tpEmit = '',
+	$tpTransp = '',
         $mod = '58',
         $serie = '',
         $nMDF = '',
@@ -346,6 +347,13 @@ class Make extends BaseMake
             $tpEmit,
             true,
             $identificador . "Indicador da tipo de emitente"
+        );
+	$this->dom->addChild(
+            $ide,
+            "tpTransp",
+            $tpTransp,
+            false,
+            $identificador . "Indicador do tipo de transporte"
         );
         $this->dom->addChild(
             $ide,
