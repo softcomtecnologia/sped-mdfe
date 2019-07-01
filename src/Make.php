@@ -307,7 +307,7 @@ class Make extends BaseMake
         $cUF = '',
         $tpAmb = '',
         $tpEmit = '',
-	$tpTransp = '',
+	    $tpTransp = '',
         $mod = '58',
         $serie = '',
         $nMDF = '',
@@ -319,7 +319,9 @@ class Make extends BaseMake
         $procEmi = '',
         $verProc = '',
         $ufIni = '',
-        $ufFim = ''
+        $ufFim = '',    
+        $indCanalVerde = '',
+        $indCarregaPosterior = ''
     ) {
         $this->tpAmb = $tpAmb;
         if ($dhEmi == '') {
@@ -439,9 +441,33 @@ class Make extends BaseMake
             true,
             $identificador . "Sigla da UF do Descarregamento"
         );
+
+        $this->canalVerde = $indCanalVerde;
+        $this->carregaPosterior = $indCarregaPosterior;
+
         $this->mod = $mod;
         $this->ide = $ide;
         return $ide;
+    }
+
+    public function tagCanalVerdeCarregaPosterior(
+        $indCanalVerde = '',
+        $indCarregaPosterior = ''
+    ){
+        $this->dom->addChild(
+            $this->ide,
+            "indCanalVerde",
+            $indCanalVerde,
+            false,
+            "Indicador de participação do Canal Verde"
+        );
+        $this->dom->addChild(
+            $this->ide,
+            "indCarregaPosterior",
+            $indCarregaPosterior,
+            false,
+            "Indicador de MDF-e com inclusão da Carga posterior a emissão por evento de inclusão de DF-e"
+        );        
     }
 
     /**
@@ -472,7 +498,9 @@ class Make extends BaseMake
             true,
             "Nome do Município de Carregamento"
         );
+
         $this->aInfMunCarrega[] = $infMunCarrega;
+
         return $infMunCarrega;
     }
 
@@ -1636,7 +1664,10 @@ class Make extends BaseMake
     protected function zTagIde()
     {
         $this->dom->addArrayChild($this->ide, $this->aInfMunCarrega);
+
         $this->dom->addArrayChild($this->ide, $this->aInfPercurso);
+
+        $this->tagCanalVerdeCarregaPosterior($this->canalVerde,$this->carregaPosterior);
     }
 
     /**
