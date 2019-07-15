@@ -958,6 +958,11 @@ class Tools extends BaseTools
                 $aliasEvento = 'EvIncCondut';
                 $descEvento = 'Inclusao Condutor';
                 break;
+            case '110115':
+                //inclusao do DFe
+                $aliasEvento = 'EvIncDFe';
+                $descEvento = 'Inclusao DF-e';
+                break;
             default:
                 $msg = "O código do tipo de evento informado não corresponde a "
                     . "nenhum evento estabelecido.";
@@ -998,15 +1003,17 @@ class Tools extends BaseTools
         return true;
     }
 
+    /**
+     * @param $xml
+     * @param $nSeqEvento
+     * @param $chaveMdfe
+     * @param array $aRetorno
+     * @return string
+     */
     public function sefazInclusaoDFe(
-        $chaveMdfe = '',
-        $nProt = '',
-        $cMunCarrega = '',
-        $xMunCarrega = '',
-        $cMunDescarga = '',
-        $xMunDescarga = '',
-        $dfe = '',
-        $nSeqEvento = '',
+        $xml,
+        $nSeqEvento,
+        $chaveMdfe,
         &$aRetorno = array()
     )
     {
@@ -1017,22 +1024,13 @@ class Tools extends BaseTools
             $msg = "Uma chave de MDFe válida não foi passada como parâmetro $chaveMdfe.";
             throw new Exception\InvalidArgumentException($msg);
         }
-        if ($nProt == '') {
-            $msg = "Não foi passado o numero do protocolo!!";
-            throw new Exception\InvalidArgumentException($msg);
-        }
+
         $tpEvento = '110115';
         if ($nSeqEvento == '') {
             $nSeqEvento = '1';
         }
-
-        $tagAdic = '<evIncDFeMDFe><descEvento>Inclusao DF-e</descEvento><nProt>' . $nProt . '</nProt>' .
-            '<cMunCarrega>' . $cMunCarrega . '</cMunCarrega><xMunCarrega>' . $xMunCarrega . '</xMunCarrega>' .
-            '<infDoc><cMunDescarga>' . $cMunDescarga . '</cMunDescarga><xMunDescarga>' . $xMunDescarga . '</xMunDescarga>' .
-            '<chNFe>' . $dfe . '</chNFe></infDoc></evIncDFeMDFe>';
-
         $cOrgao = '';
-        $retorno = $this->zSefazEvento($siglaUF, $chaveMdfe, $cOrgao, $tpAmb, $tpEvento, $nSeqEvento, $tagAdic);
+        $retorno = $this->zSefazEvento($siglaUF, $chaveMdfe, $cOrgao, $tpAmb, $tpEvento, $nSeqEvento, $xml);
         $aRetorno = $this->aLastRetEvent;
         return $retorno;
     }

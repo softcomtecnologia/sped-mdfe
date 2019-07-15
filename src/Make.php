@@ -212,9 +212,6 @@ class Make extends BaseMake
      */
     private $ainfContratante = []; //array de DOMNode
 
-	protected $canalVerde = "";
-	protected $carregaPosterior = "";
-
     /**
      *
      * @return boolean
