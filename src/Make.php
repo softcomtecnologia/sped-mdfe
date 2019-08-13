@@ -544,8 +544,14 @@ class Make extends BaseMake
         $xFant = ''
     ) {
         $identificador = '[25] <emit> - ';
+        $labelDocumento = 'CNPJ';
+
+        if (strlen($cnpj) == 11) {
+            $labelDocumento = 'CPF';
+        }
+
         $this->emit = $this->dom->createElement("emit");
-        $this->dom->addChild($this->emit, "CNPJ", $cnpj, true, $identificador . "CNPJ do emitente");
+        $this->dom->addChild($this->emit, $labelDocumento, $cnpj, true, $identificador . "CNPJ do emitente");
         $this->dom->addChild($this->emit, "IE", $numIE, true, $identificador . "Inscrição Estadual do emitente");
         $this->dom->addChild($this->emit, "xNome", $xNome, true, $identificador . "Razão Social ou Nome do emitente");
         $this->dom->addChild($this->emit, "xFant", $xFant, false, $identificador . "Nome fantasia do emitente");
@@ -1824,9 +1830,18 @@ class Make extends BaseMake
         $infMDFe = $dom->getElementsByTagName("infMDFe")->item(0);
         $ide = $dom->getElementsByTagName("ide")->item(0);
         $emit = $dom->getElementsByTagName("emit")->item(0);
+
+        if ($emit->getElementsByTagName('CNPJ')->item(0)) {
+            $cnpj = $emit->getElementsByTagName('CNPJ')->item(0)->nodeValue;    
+        }
+
+        if ($emit->getElementsByTagName('CPF')->item(0)) {
+            $cnpj = str_pad($emit->getElementsByTagName('CPF')->item(0)->nodeValue, 14, '0', STR_PAD_LEFT);    
+        }
+        
         $cUF = $ide->getElementsByTagName('cUF')->item(0)->nodeValue;
         $dhEmi = $ide->getElementsByTagName('dhEmi')->item(0)->nodeValue;
-        $cnpj = $emit->getElementsByTagName('CNPJ')->item(0)->nodeValue;
+        
         $mod = $ide->getElementsByTagName('mod')->item(0)->nodeValue;
         $serie = $ide->getElementsByTagName('serie')->item(0)->nodeValue;
         $nNF = $ide->getElementsByTagName('nMDF')->item(0)->nodeValue;

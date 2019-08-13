@@ -797,6 +797,12 @@ class Tools extends BaseTools
             $cnpj = $this->aConfig['cnpj'];
         }
         $siglaUF = $this->aConfig['siglaUF'];
+
+        $tagDocumento = "<CNPJ>$cnpj</CNPJ>";
+
+        if (strlen($cnpj) == 11) {
+            $tagDocumento = "<CPF>$cnpj</CPF>";
+        }
         //carrega serviço
         $servico = 'MDFeConsNaoEnc';
         $this->zLoadServico(
@@ -811,7 +817,7 @@ class Tools extends BaseTools
         }
         $cons = "<consMDFeNaoEnc xmlns=\"$this->urlPortal\" versao=\"$this->urlVersion\">"
             . "<tpAmb>$tpAmb</tpAmb>"
-            . "<xServ>CONSULTAR NÃO ENCERRADOS</xServ><CNPJ>$cnpj</CNPJ></consMDFeNaoEnc>";
+            . "<xServ>CONSULTAR NÃO ENCERRADOS</xServ>$tagDocumento</consMDFeNaoEnc>";
         //valida mensagem com xsd
         //if (! $this->zValidMessage($cons, 'mdfe', 'consMDFeNaoEnc', $version)) {
         //    $msg = 'Falha na validação. '.$this->error;
@@ -881,6 +887,13 @@ class Tools extends BaseTools
         $aRet = $this->zTpEv($tpEvento);
         $aliasEvento = $aRet['alias'];
         $cnpj = $this->aConfig['cnpj'];
+
+        $tagDocumento = "<CNPJ>$cnpj</CNPJ>";
+
+        if (strlen($cnpj) == 11) {
+            $tagDocumento = "<CPF>$cnpj</CPF>";
+        }
+
         $dhEvento = (string)str_replace(' ', 'T', date('Y-m-d H:i:sP'));
         $sSeqEvento = str_pad($nSeqEvento, 2, "0", STR_PAD_LEFT);
         $eventId = "ID" . $tpEvento . $chave . $sSeqEvento;
@@ -891,7 +904,7 @@ class Tools extends BaseTools
             . "<infEvento Id=\"$eventId\">"
             . "<cOrgao>$cOrgao</cOrgao>"
             . "<tpAmb>$tpAmb</tpAmb>"
-            . "<CNPJ>$cnpj</CNPJ>"
+            . $tagDocumento
             . "<chMDFe>$chave</chMDFe>"
             . "<dhEvento>$dhEvento</dhEvento>"
             . "<tpEvento>$tpEvento</tpEvento>"
