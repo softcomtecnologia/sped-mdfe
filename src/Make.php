@@ -84,6 +84,11 @@ class Make extends BaseMake
     /**
      * @type string|\DOMNode
      */
+    private $prodPred = '';
+
+    /**
+     * @type string|\DOMNode
+     */
     private $infAdic = '';
 
     /**
@@ -258,6 +263,7 @@ class Make extends BaseMake
         $this->zTestaChaveXML($this->dom);
         //convert DOMDocument para string
         $this->xml = $this->dom->saveXML();
+
         return true;
     }
 
@@ -791,7 +797,61 @@ class Make extends BaseMake
 
         return $seg;
     }
+    /**
+     * @param $tpCarga
+     * @param $xProd
+     * @param $cEan
+     * @param $ncm
+     */
+    public function tagProdPred($tpCarga, $xProd, $cEan, $ncm)
+    {
+        $this->prodPred = $this->dom->createElement("prodPred");
 
+        $this->dom->addChild(
+            $this->prodPred,
+            "tpCarga",
+            $tpCarga,
+            true,
+            "Tipo carga"
+        );
+
+        $this->dom->addChild(
+            $this->prodPred,
+            "xProd",
+            $xProd,
+            true,
+            "Nome produto"
+        );
+
+        $this->dom->addChild(
+            $this->prodPred,
+            "cEAN",
+            $cEan,
+            true,
+            "Código de barras do produto"
+        );
+
+        $this->dom->addChild(
+            $this->prodPred,
+            "NCM",
+            $ncm,
+            true,
+            "NCM produto"
+        );
+
+        return $this->prodPred;
+    }
+    /**
+     *
+     */
+    public function zTagProdPred()
+    {
+        if ($this->infMDFe) {
+            $this->dom->appChild($this->infMDFe, $this->prodPred, "");
+        }
+
+        return $this->prodPred;
+    }
     /**
      * tagInfMDFeTransp
      * tag MDFe/infMDFeTransp/infDoc/infMunDescarga/infMDFeTranspTransp
