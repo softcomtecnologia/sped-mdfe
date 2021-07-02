@@ -75,17 +75,26 @@ class Make extends BaseMake
      * @type string|\DOMNode
      */
     private $infModal = '';
-
     /**
      * @type string|\DOMNode
      */
     private $tot = '';
-
     /**
      * @type string|\DOMNode
      */
     private $prodPred = '';
-
+    /**
+     * @var string|\DOMNode
+     */
+    private $prodPredInfLotacao = "";
+    /**
+     * @var string|\DOMNode
+     */
+    private $prodPredLocalCarregamento = "";
+    /**
+     * @var string|\DOMNode
+     */
+    private $prodPredLocalDescarregamento = "";
     /**
      * @type string|\DOMNode
      */
@@ -325,7 +334,7 @@ class Make extends BaseMake
         $procEmi = '',
         $verProc = '',
         $ufIni = '',
-        $ufFim = '',    
+        $ufFim = '',
         $indCanalVerde = '',
         $indCarregaPosterior = ''
     ) {
@@ -473,7 +482,7 @@ class Make extends BaseMake
             $indCarregaPosterior,
             false,
             "Indicador de MDF-e com inclusão da Carga posterior a emissão por evento de inclusão de DF-e"
-        );        
+        );
     }
 
     /**
@@ -802,6 +811,8 @@ class Make extends BaseMake
      * @param $xProd
      * @param $cEan
      * @param $ncm
+     * @param null $infLotacao
+     * @return DOMElement|\DOMNode|string
      */
     public function tagProdPred($tpCarga, $xProd, $cEan, $ncm)
     {
@@ -842,15 +853,142 @@ class Make extends BaseMake
         return $this->prodPred;
     }
     /**
-     *
+     * @param null $cep
+     * @param null $latitude
+     * @param null $longitude
+     * @return DOMElement|\DOMNode|string
+     */
+    public function tagProdPredCarregamento($cep = null, $latitude = null, $longitude = null)
+    {
+        $this->prodPredLocalCarregamento = $this->dom->createElement("infLocalCarrega");
+
+        if (!is_null($cep)) {
+            $this->dom->addChild(
+                $this->prodPredLocalCarregamento,
+                "CEP",
+                $cep,
+                true,
+                "CEP"
+            );
+        }
+
+        if (is_null($cep) && (!is_null($latitude) || !is_null($longitude))) {
+            $this->dom->addChild(
+                $this->prodPredLocalCarregamento,
+                "latitude",
+                $latitude,
+                true,
+                "Latitude"
+            );
+
+            $this->dom->addChild(
+                $this->prodPredLocalCarregamento,
+                "longitude",
+                $longitude,
+                true,
+                "Longitude"
+            );
+        }
+
+        return $this->prodPredLocalCarregamento;
+    }
+
+    /**
+     * @param null $cep
+     * @param null $latitude
+     * @param null $longitude
+     * @return \DOMNode|string
+     */
+    public function tagProdPredDescarregamento($cep = null, $latitude = null, $longitude = null)
+    {
+        $this->prodPredLocalDescarregamento = $this->dom->createElement("infLocalDescarrega");
+
+        if (!is_null($cep)) {
+            $this->dom->addChild(
+                $this->prodPredLocalDescarregamento,
+                "CEP",
+                $cep,
+                true,
+                "CEP"
+            );
+        }
+
+        if (is_null($cep) && (!is_null($latitude) || !is_null($longitude))) {
+            $this->dom->addChild(
+                $this->prodPredLocalDescarregamento,
+                "latitude",
+                $latitude,
+                true,
+                "Latitude"
+            );
+
+            $this->dom->addChild(
+                $this->prodPredLocalDescarregamento,
+                "longitude",
+                $longitude,
+                true,
+                "Longitude"
+            );
+        }
+
+        return $this->prodPredLocalCarregamento;
+    }
+    /**
+     * @return \DOMNode|string
      */
     public function zTagProdPred()
     {
         if ($this->infMDFe) {
             $this->dom->appChild($this->infMDFe, $this->prodPred, "");
+            $this->zTagProdPredInfLotacao();
         }
 
         return $this->prodPred;
+    }
+    /**
+     * @return \DOMNode|string
+     */
+    public function zTagProdPredCarregamento()
+    {
+        if ($this->prodPredInfLotacao === "") {
+            $this->prodPredInfLotacao = $this->dom->createElement("infLotacao");
+        }
+
+        if ($this->prodPredLocalCarregamento) {
+            $this->dom->appChild($this->prodPredInfLotacao, $this->prodPredLocalCarregamento, "");
+        }
+
+        return $this->prodPredLocalCarregamento;
+
+    }
+    /**
+     * @return \DOMNode|string
+     */
+    public function zTagProdPredDescarregamento()
+    {
+        if ($this->prodPredInfLotacao === "") {
+            $this->prodPredInfLotacao = $this->dom->createElement("infLotacao");
+        }
+
+        if ($this->prodPredLocalDescarregamento) {
+            $this->dom->appChild($this->prodPredInfLotacao, $this->prodPredLocalDescarregamento, "");
+        }
+
+        return $this->prodPredLocalDescarregamento;
+    }
+    /**
+     * @return \DOMNode|string
+     */
+    public function zTagProdPredInfLotacao()
+    {
+        $this->zTagProdPredCarregamento();
+        $this->zTagProdPredDescarregamento();
+
+        if ($this->prodPredInfLotacao) {
+            $this->dom->appChild($this->prodPred, $this->prodPredInfLotacao, "");
+        }
+
+        return $this->prodPredInfLotacao;
     }
     /**
      * tagInfMDFeTransp
@@ -1892,16 +2030,16 @@ class Make extends BaseMake
         $emit = $dom->getElementsByTagName("emit")->item(0);
 
         if ($emit->getElementsByTagName('CNPJ')->item(0)) {
-            $cnpj = $emit->getElementsByTagName('CNPJ')->item(0)->nodeValue;    
+            $cnpj = $emit->getElementsByTagName('CNPJ')->item(0)->nodeValue;
         }
 
         if ($emit->getElementsByTagName('CPF')->item(0)) {
-            $cnpj = str_pad($emit->getElementsByTagName('CPF')->item(0)->nodeValue, 14, '0', STR_PAD_LEFT);    
+            $cnpj = str_pad($emit->getElementsByTagName('CPF')->item(0)->nodeValue, 14, '0', STR_PAD_LEFT);
         }
-        
+
         $cUF = $ide->getElementsByTagName('cUF')->item(0)->nodeValue;
         $dhEmi = $ide->getElementsByTagName('dhEmi')->item(0)->nodeValue;
-        
+
         $mod = $ide->getElementsByTagName('mod')->item(0)->nodeValue;
         $serie = $ide->getElementsByTagName('serie')->item(0)->nodeValue;
         $nNF = $ide->getElementsByTagName('nMDF')->item(0)->nodeValue;
@@ -2020,3 +2158,4 @@ class Make extends BaseMake
         return $list;
     }
 }
+
