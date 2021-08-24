@@ -938,7 +938,7 @@ class Make extends BaseMake
      */
     public function zTagProdPred()
     {
-        if ($this->infMDFe) {
+        if ($this->infMDFe && $this->prodPred) {
             $this->dom->appChild($this->infMDFe, $this->prodPred, "");
             $this->zTagProdPredInfLotacao();
         }
