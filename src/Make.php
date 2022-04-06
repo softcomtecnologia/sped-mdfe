@@ -1499,7 +1499,7 @@ class Make extends BaseMake
         $this->rodo = $this->dom->createElement("rodo");
         $this->infANTT = $this->dom->createElement('infANTT');
 
-        if ($rntrc) {
+        if (!is_null($rntrc) && $rntrc !== "") {
             $this->dom->addChild(
                 $this->infANTT,
                 "RNTRC",
