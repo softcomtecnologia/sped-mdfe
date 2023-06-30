@@ -69,7 +69,7 @@ class Tools extends BaseTools
     {
         parent::__construct($configJson);
 
-        $this->pathSchemes = realpath(__DIR__ . "/../../mdfe-laravel/src/schemes") . "/";
+        $this->pathSchemes = realpath(__DIR__ . "/../../softcom-laravel/mdfe-laravel/src/schemes") . "/";
     }
 
     /**
