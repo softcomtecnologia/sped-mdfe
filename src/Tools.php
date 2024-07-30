@@ -24,6 +24,8 @@ use NFePHP\Common\Dom\ValidXsd;
 use NFePHP\MDFe\Auxiliar\Response;
 use NFePHP\MDFe\Mail;
 use NFePHP\MDFe\Auxiliar\Identify;
+use Softcomtecnologia\EmpresaLaravel\Db\Model\Empresa;
+use Softcomtecnologia\NuvemFiscalLaravel\Db\GerarCertificado\ConfiguracoesCertificado;
 
 if (!defined('NFEPHP_ROOT')) {
     define('NFEPHP_ROOT', dirname(dirname(__FILE__)));
@@ -414,11 +416,17 @@ class Tools extends BaseTools
         //    throw new Exception\RuntimeException($msg);
         //}
         //montagem dos dados da mensagem SOAP
-        $body = "<mdfeDadosMsg xmlns=\"$this->urlNamespace\">$cons</mdfeDadosMsg>";
+
+        $xml = \NFePHP\Common\Strings::clearXmlString($xml, true);
+        $gzdata = base64_encode(gzencode($xml, 9, FORCE_GZIP));
+
+        $body = "<mdfeDadosMsg xmlns=\"$this->urlNamespace\">$gzdata</mdfeDadosMsg>";
         $method = $this->urlMethod;
+
         //envia a solicitação via SOAP
         $retorno = $this->oSoap->send($this->urlService, $this->urlNamespace, $this->urlHeader, $body, $method);
         $lastMsg = $this->oSoap->lastMsg;
+
         $this->soapDebug = $this->oSoap->soapDebug;
         //salva mensagens
         $filename = "$idLote-enviMDFe.xml";
@@ -427,7 +435,25 @@ class Tools extends BaseTools
         $this->zGravaFile('mdfe', $tpAmb, $filename, $retorno);
         //tratar dados de retorno
         $aRetorno = Response::readReturnSefaz($servico, $retorno);
-        return (string)$retorno;
+        return (string) $retorno;
+    }
+
+    protected function extractXmlAutorizado($xmlString)
+    {
+        $xml = new \SimpleXMLElement($xmlString);
+
+        $namespaces = $xml->getNamespaces(true);
+
+        $xml->registerXPathNamespace('soap12', $namespaces['soap12']);
+        $xml->registerXPathNamespace('ns', $namespaces['']);
+
+        $xmlAutorizado = $xml->xpath('//ns:mdfeDadosMsg');
+
+        if (!empty($xmlAutorizado)) {
+            return gzdecode(base64_decode((string)$xmlAutorizado[0]));
+        }
+
+        return false;
     }
 
     /**
